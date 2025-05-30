@@ -1,0 +1,77 @@
+Experiment 7: Ansible Basics — Inventory, Playbooks, Modules
+What is Ansible?
+Open-source IT automation and configuration management tool.
+
+Manages multiple servers over SSH (agentless).
+
+Automates configuration, deployment, orchestration.
+
+Key Concepts:
+Inventory: File listing hosts or groups to manage (INI or YAML format).
+
+Playbook: YAML file defining tasks to run on hosts. Contains:
+
+hosts — target machines/groups
+
+tasks — list of actions
+
+modules — reusable scripts for specific tasks (e.g., file, copy)
+
+Modules: Built-in tools like apt, yum, copy, file, etc.
+
+Why Use Ansible?
+Agentless (uses SSH)
+
+Simple YAML syntax
+
+Idempotent (safe to rerun)
+
+Scalable from few to thousands of nodes
+
+Step 1: Check Ansible version
+bash
+
+ansible --version
+Step 2: Create Inventory file (hosts.ini)
+Use a text editor like gedit or nano:
+
+bash
+
+gedit hosts.ini
+Add content:
+
+ini
+
+[local]
+localhost ansible_connection=local
+Step 3: Create Playbook file (setup.yml)
+Create file with editor:
+
+bash
+
+gedit setup.yml
+Paste the following content:
+
+yaml
+
+---
+- name: Basic Server Setup (Without Sudo)
+  hosts: local
+  tasks:
+    - name: Create a directory for development
+      file:
+        path: "{{ ansible_env.HOME }}/dev"
+        state: directory
+        mode: '0755'
+
+    - name: Create a text file with content
+      copy:
+        content: |
+          This is a test file created by Ansible.
+        dest: "{{ ansible_env.HOME }}/test_file.txt"
+        mode: '0644'
+Step 4: Run the playbook
+bash
+
+ansible-playbook -i hosts.ini setup.yml
+This will create a dev directory and a text file test_file.txt in your home directory on the local machine.
