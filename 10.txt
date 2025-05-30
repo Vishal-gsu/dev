@@ -1,0 +1,87 @@
+Experiment 10: Build Maven/Gradle Project with Azure Pipelines
+Step 1: Prepare Maven Project
+Create or use an existing Maven project.
+
+Push code to a GitHub repository.
+
+Step 2: Create Azure DevOps Project
+Go to https://dev.azure.com
+
+Click New Project, enter name, set visibility, and create.
+
+Step 3: Connect GitHub Repo to Azure Pipeline
+In Azure DevOps project:
+
+Pipelines > Create Pipeline
+
+Select GitHub, authorize, and choose your repo.
+
+Select Maven pipeline template.
+
+Save pipeline (do not run yet).
+
+Step 4: Create Personal Access Token (PAT)
+In Azure DevOps portal:
+
+Click profile icon > Security > Personal Access Token
+
+Create new token with Full Access
+
+Copy and save the token securely.
+
+Step 5: Setup Self-hosted Agent
+In terminal:
+
+bash
+
+mkdir myagent && cd myagent
+wget https://vstsagentpackage.azureedge.net/agent/3.236.1/vsts-agent-linux-x64-3.236.1.tar.gz
+tar zxvf vsts-agent-linux-x64-3.236.1.tar.gz
+./config.sh
+
+Follow prompts:
+
+Server URL: https://dev.azure.com/YOUR_ORG_NAME
+
+Auth Type: PAT
+
+Paste PAT token
+
+Agent Pool: Default (or your pool)
+
+Agent Name: e.g., mylinuxagent
+
+Accept defaults
+
+Step 6: Run the Agent
+bash
+
+./run.sh
+
+Keep this terminal open; the agent is now listening.
+
+Step 7: Modify and Run Pipeline
+In Azure DevOps:
+
+Go to Pipelines > Your Pipeline > Edit
+
+Change:
+
+pool:
+  vmImage: 'ubuntu-latest'
+to
+
+pool:
+  name: Default
+
+Change jdkVersionOption: 'default' if needed.
+
+Save and Run Pipeline.
+
+Step 8: Verify Build Results
+Monitor build stages: success/failure.
+
+Check unit test results and reports.
+
+View code coverage details.
+
