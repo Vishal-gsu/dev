@@ -1,0 +1,107 @@
+1️⃣ Create Maven Project
+bash
+Copy
+Edit
+cd ~/Desktop
+mvn archetype:generate -DgroupId=com.example -DartifactId=hello-world \
+-DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+
+cd hello-world
+mvn package
+java -cp target/hello-world-1.0-SNAPSHOT.jar com.example.App
+mvn test
+2️⃣ Push Project to GitHub
+bash
+git init
+git add .
+git config --global user.email "youremail@example.com"
+git config --global user.name "YourUsername"
+git commit -m "First Commit"
+git remote add origin https://github.com/YourUsername/Maven-CI.git
+git branch -M main
+git push -u origin main
+💡 Note: Create a GitHub token under
+Profile → Settings → Developer Settings → Tokens (classic) → repo → Generate
+
+3️⃣ Start Jenkins
+bash
+cd ~/Downloads  # or wherever jenkins.war is located
+java -jar jenkins.war --httpPort=8080
+Then go to:
+🔗 http://localhost:8080 and log in
+
+4️⃣ Create Jenkins Job (Maven-CI)
+Click New Item → Freestyle Project → OK
+
+Under Source Code Management:
+
+Select: Git
+
+Repo URL: https://github.com/YourUsername/Maven-CI.git
+
+Branch: */main
+
+Under Build Steps:
+
+Add Invoke Top-Level Maven Targets
+
+Goal: clean package
+
+Under Post-Build Actions:
+
+Add Execute shell
+
+Command:
+
+bash
+ansible-playbook -i /home/student/hosts.ini /home/student/deploy.yml
+
+5️⃣ Setup Ansible Deployment
+Create inventory file
+bash
+
+gedit ~/hosts.ini
+
+Paste:
+
+bash
+
+[local]
+localhost ansible_connection=local
+Create Ansible playbook
+bash
+
+gedit ~/deploy.yml
+Paste:
+
+---
+- name: Deploy Maven Artifact
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+    - name: Copy the artifact to the deployment directory
+      copy:
+        src: "/home/student/Desktop/hello-world/target/hello-world-1.0-SNAPSHOT.jar"
+        dest: "/home/student/local/jenkins/deploy/hello-world.jar"
+
+Create Deployment Directory
+bash
+
+mkdir -p ~/local/jenkins/deploy
+
+6️⃣ Run Jenkins Build
+Go to Jenkins dashboard
+
+Click on your job → Build Now
+
+View Console Output and verify success
+
+Check deployment directory:
+
+bash
+Copy
+Edit
+ls ~/local/jenkins/deploy/
+✅ You should see hello-world.jar
